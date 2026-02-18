@@ -1,0 +1,41 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main  # Run this robot whenever we push to "main"
+
+jobs:
+  terraform:
+    name: "Terraform Build"
+    runs-on: ubuntu-latest  # The robot uses a fresh Linux computer
+
+    steps:
+      # 1. Get the code from the repo
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # 2. Install Terraform on the robot
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      # 3. Wake up & Connect to S3 (The Memory)
+      - name: Terraform Init
+        run: terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # 4. Check what needs to be built
+      - name: Terraform Plan
+        run: terraform plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # 5. BUILD IT (Auto-Approve)
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

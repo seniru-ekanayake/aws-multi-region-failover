@@ -8,6 +8,13 @@ terraform {
       version = "~> 5.0"
     }
   }
+  # --- NEW PART: REMOTE BACKEND ---
+  backend "s3" {
+    bucket = "terraform-state-seniru-123"  
+    key    = "global/s3/terraform.tfstate"
+    region = "us-east-1"
+  }
+  # --------------------------------
 }
 
 # Provider 1: US East (Virginia)
